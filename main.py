@@ -1,41 +1,30 @@
 import sys
+import os # Отсюда нам понадобятся методы для отображения содержимого директорий
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QMessageBox
+import desing
 
-
-def click():
-    msg = QMessageBox()
-    msg.setWindowTitle("Уведомление")
-    msg.setText("Внимание! Нажми ещё раз!")
-    msg.setIcon(QtWidgets.QMessageBox.Critical)
-    result = msg.exec_()
 
 def main():
-    app = QApplication(sys.argv)
-    win = QMainWindow()
-    win.setGeometry(400, 400, 400, 300)
-    win.setWindowTitle("GUI на Python")
+    app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
+    window = ExampleApp()  # Создаём объект класса ExampleApp
+    window.show()  # Показываем окно
+    app.exec_()  # и запускаем приложение
 
-    # Добавление lable
-    label = QLabel(win)
-    label.resize(300, 50)
-    label.setText("Привет! Я будущий текст заголовка!")
-    label.move(100, 100)
+class ExampleApp (QtWidgets.QMainWindow, desing.Ui_MainWindow):
+    def __init__(self):
 
-    # Добавление тестового поля
-    textbox = QtWidgets.QLineEdit(win)
-    textbox.move(100, 150)
-    textbox.resize(180, 30)
+        super().__init__()
+        self.setupUi(self) #Инициализация дизайна
+        self.btnBrowseFolder.clicked.connect(self.browse_folder)
 
-    # Добавление кнопки
-    button = QtWidgets.QPushButton(win)
-    button.setText("Нажми меня!")
-    button.move(100, 200)
-    button.clicked.connect(click)
+    def browse_folder(self):
+        self.listWidget.clear() #На случай, если в списке уже есть элементы
+        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Выберите папку")
 
-    win.show()
-    sys.exit(app.exec_())
-main()
+        if directory: # не продолжать выполнение, если пользователь не выбрал директорию
+            for file_name in os.listdir(directory): # для каждого файла в директории
+                self.listWidget.addItem(file_name) # добавить файл в listWidget
 
-
+if __name__ == '__main__': # Если мы запускаем файл напрямую, а не импортируем
+    main() # то запускаем функцию main()
 
